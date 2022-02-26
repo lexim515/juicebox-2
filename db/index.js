@@ -183,7 +183,10 @@ const getPostById = async (postId) => {
     );
 
     if (!post) {
-      return null;
+      throw {
+        name: "PostNotFoundError",
+        message: "Could noot find a post with that postId",
+      };
     }
 
     const { rows: tags } = await client.query(
@@ -331,6 +334,25 @@ const getAllTags = async () => {
   }
 };
 
+async function getUserByUsername(username) {
+  try {
+    const {
+      rows: [user],
+    } = await client.query(
+      `
+      SELECT *
+      FROM users
+      WHERE username=$1;
+    `,
+      [username]
+    );
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   client,
   createUser,
@@ -347,4 +369,5 @@ module.exports = {
   getAllTags,
   createPostTag,
   addTagsToPost,
+  getUserByUsername,
 };
